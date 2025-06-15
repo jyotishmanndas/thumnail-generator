@@ -20,6 +20,7 @@ model User {
   password      String?
   emailVerified DateTime?
   image         String?
+  credits       Int       @default(5)
   accounts      Account[]
   sessions      Session[]
 
