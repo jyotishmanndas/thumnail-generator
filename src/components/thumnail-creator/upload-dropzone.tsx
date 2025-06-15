@@ -8,7 +8,11 @@ import { toast } from "sonner";
 import { Style } from "./style";
 import { removeBackground } from "@imgly/background-removal";
 import { Button } from "../ui/button";
-
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { inter, domine } from "../../app/fonts"
 const presets = {
     style1: {
         fontSize: 100,
@@ -38,7 +42,8 @@ export function UploadDropzone() {
     const [image, setImage] = useState<string | null>(null);
     const [processImage, setProcessImage] = useState<string | null>(null);
     const [canvasReady, setCanvasReady] = useState(false);
-    const [text, setText] = useState("POV");
+    const [text, setText] = useState("");
+    const [font, setFont] = useState("arial")
 
     // const { startUpload } = useUploadThing("pdfUploader")
 
@@ -84,7 +89,14 @@ export function UploadDropzone() {
             ctx.textBaseline = "alphabetic";
 
             let fontsize = 100;
-            let selectFont = "Arial";
+            let selectFont = "arial";
+            switch (font) {
+                case "inter":
+                    selectFont = inter.style.fontFamily;
+                    break;
+                case "domine":
+                    selectFont = domine.style.fontFamily;
+            }
 
             ctx.font = `${preset.fontWeight} ${preset.fontSize}px ${selectFont}`
             const textWidth = ctx.measureText(text).width
@@ -127,20 +139,55 @@ export function UploadDropzone() {
                 <>
                     {loading ? (
                         <div className="flex items-center justify-center">
-                            <div className="h-10 w-10 animate-spin rounded-full birder-2 border-dashed border-gray-800"></div>
+                            <div className="h-10 w-10 animate-spin rounded-full border-2 border-dashed border-gray-800"></div>
                         </div>
                     ) : (
-                        <div className="my-4 w-full flex flex-col items-center gap-3">
-                            <button onClick={() => {
-                                setImage(null);
-                                setProcessImage(null);
-                                setCanvasReady(false)
-                            }} className="flex items-center gap-2 self-start">
-                                <ArrowLeft className="w-4 h-4" />
-                                <span>Go back</span>
-                            </button>
-                            <canvas ref={canvasRef} className="max-h-lg h-auto w-full max-w-lg rounded-lg" />
-                            <Button className="mt-5 w-full" onClick={handleDownload}>Download</Button>
+                        <div className="flex w-full max-w-2xl flex-col items-center gap-4">
+                            <div className="my-4 w-full flex flex-col items-center gap-3">
+                                <button onClick={() => {
+                                    setImage(null);
+                                    setProcessImage(null);
+                                    setCanvasReady(false)
+                                }} className="flex items-center gap-2 self-start">
+                                    <ArrowLeft className="w-4 h-4" />
+                                    <span>Go back</span>
+                                </button>
+                                <canvas ref={canvasRef} className="max-h-lg h-auto w-full max-w-lg rounded-lg" />
+                            </div>
+                            <Card className="w-full">
+                                <CardHeader>
+                                    <CardTitle>Edit</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid w-full items-center gap-4">
+                                        <div className="flex flex-col gap-1.5">
+                                            <Label htmlFor="text">Text</Label>
+                                            <Input id="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="text to thumbnail" />
+                                        </div>
+                                        <div className="flex flex-col gap-1.5">
+                                            <Label htmlFor="font">Font</Label>
+                                            <Select value={text} onValueChange={(value) => {
+                                                setFont(value)
+                                            }}>
+                                                <SelectTrigger id="font">
+                                                    <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent position="popper">
+                                                    <SelectGroup>
+                                                        <SelectItem value="arial">Arial</SelectItem>
+                                                        <SelectItem value="inter">Inter</SelectItem>
+                                                        <SelectItem value="Domine">Domine</SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="flex justify-between gap-2">
+                                    <Button className="w-full" onClick={handleDownload}>Download</Button>
+                                    <Button className="w-full" onClick={draw}>Update</Button>
+                                </CardFooter>
+                            </Card>
                         </div>
                     )}
                 </>
