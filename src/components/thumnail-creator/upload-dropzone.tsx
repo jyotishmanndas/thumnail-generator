@@ -1,15 +1,13 @@
 "use client"
 
-import { Cloud, File, Loader, Loader2 } from "lucide-react";
+import { ArrowLeft, Cloud } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone"
 // import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { Style } from "./style";
 import { removeBackground } from "@imgly/background-removal";
-import { Progress } from "../ui/progress";
-
+import { Button } from "../ui/button";
 
 const presets = {
     style1: {
@@ -27,8 +25,8 @@ const presets = {
     style3: {
         fontSize: 100,
         fontWeight: "bold",
-        color: "rgba(255, 255, 255, 0.8)",
-        opacity: 0.8
+        color: "rgba(255, 255, 255, 0.7)",
+        opacity: 0.7
     }
 }
 
@@ -114,6 +112,15 @@ export function UploadDropzone() {
         img.src = image
     }
 
+    const handleDownload = async () => {
+        if (canvasRef.current) {
+            const link = document.createElement("a");
+            link.download = "image.png";
+            link.href = canvasRef.current.toDataURL();
+            link.click();
+        }
+    }
+
     return (
         <>
             {image ? (
@@ -123,9 +130,18 @@ export function UploadDropzone() {
                             <div className="h-10 w-10 animate-spin rounded-full birder-2 border-dashed border-gray-800"></div>
                         </div>
                     ) : (
-                        <>
+                        <div className="my-4 w-full flex flex-col items-center gap-3">
+                            <button onClick={() => {
+                                setImage(null);
+                                setProcessImage(null);
+                                setCanvasReady(false)
+                            }} className="flex items-center gap-2 self-start">
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>Go back</span>
+                            </button>
                             <canvas ref={canvasRef} className="max-h-lg h-auto w-full max-w-lg rounded-lg" />
-                        </>
+                            <Button className="mt-5 w-full" onClick={handleDownload}>Download</Button>
+                        </div>
                     )}
                 </>
             ) : (
