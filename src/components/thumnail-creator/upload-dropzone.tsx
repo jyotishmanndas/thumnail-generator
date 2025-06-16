@@ -1,35 +1,37 @@
 "use client"
 
-import { ArrowLeft, Cloud } from "lucide-react";
+import { ArrowLeft, Cloud, Download } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone"
-import { toast } from "sonner";
-import { Style } from "./style";
 import { removeBackground } from "@imgly/background-removal";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { inter, domine, presets } from "../../app/fonts"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Credit } from "@/app/actions/credit";
+import { Slider } from "../ui/slider";
+import { fonts } from "@/app/fonts";
 
 export function UploadDropzone() {
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [selectedStyle, setSelectedStyle] = useState("style1");
     const [loading, setIsLoading] = useState<boolean>(false);
+    const [canvasReady, setCanvasReady] = useState(false);
     const [image, setImage] = useState<string | null>(null);
     const [processImage, setProcessImage] = useState<string | null>(null);
-    const [canvasReady, setCanvasReady] = useState(false);
     const [text, setText] = useState("");
-    const [font, setFont] = useState("arial");
+    const [fontSize, setFontSize] = useState(48);
+    const [fontFamily, setFontFamily] = useState("Arial");
+    const [textOpacity, setTextOpacity] = useState([100])
+    const [horizontalPosition, setHorizontalPosition] = useState([50]);
+    const [verticalPosition, setVerticalPosition] = useState([50]);
 
     useEffect(() => {
         if (canvasReady) {
             draw();
         }
-    }, [canvasReady])
+    }, [canvasReady, text, fontSize, fontFamily, horizontalPosition, verticalPosition, textOpacity, image])
 
     const draw = () => {
         if (!canvasRef.current || !canvasReady || !image || !processImage) {
@@ -37,7 +39,7 @@ export function UploadDropzone() {
         }
 
         const canvass = canvasRef.current;
-        const ctx = canvass.getContext("2d")
+        const ctx = canvass.getContext("2d");
         if (!ctx) return;
 
         const img = new Image();
@@ -46,60 +48,29 @@ export function UploadDropzone() {
             canvass.width = img.width;
             canvass.height = img.height;
 
-            ctx.drawImage(img, 0, 0, canvass.width, canvass.height)
-
-            let preset = presets.style1;
-
-            switch (selectedStyle) {
-                case "style2":
-                    preset = presets.style2;
-                    break;
-                case "style3":
-                    preset = presets.style3;
-                    break;
-
-            }
+            ctx.drawImage(img, 0, 0, canvass.width, canvass.height);
             ctx.save();
 
-            // calculate font size and to fill to image of the canvas
-
             ctx.textAlign = "center";
-            ctx.textBaseline = "alphabetic";
+            ctx.textBaseline = "middle";
+            ctx.font = `${fontSize}px ${fontFamily}`;
+            ctx.globalAlpha = textOpacity[0] / 100;
 
-            let fontsize = 100;
-            let selectFont = "arial";
-            switch (font) {
-                case "inter":
-                    selectFont = inter.style.fontFamily;
-                    break;
-                case "domine":
-                    selectFont = domine.style.fontFamily;
-            }
+            const x = (horizontalPosition[0] / 100) * canvass.width;
+            const y = (verticalPosition[0] / 100) * canvass.height;
 
-            ctx.font = `${preset.fontWeight} ${preset.fontSize}px ${selectFont}`
-            const textWidth = ctx.measureText(text).width
-            const targetWidth = canvass.width * 0.9;
-
-            fontsize = (targetWidth / textWidth) * fontsize
-            ctx.font = `${preset.fontWeight} ${fontsize}px ${selectFont}`
-            ctx.fillStyle = preset.color;
-            ctx.globalAlpha = preset.opacity;
-
-            const x = canvass.width / 2;
-            const y = canvass.height / 2;
-
-            ctx.translate(x, y);
-            ctx.fillText(text, 0, 0);
+            ctx.fillStyle = "white";
+            ctx.fillText(text, x, y);
             ctx.restore();
 
             const fgImg = new Image();
             fgImg.onload = () => {
-                ctx.drawImage(fgImg, 0, 0, canvass.width, canvass.height)
+                ctx.drawImage(fgImg, 0, 0, canvass.width, canvass.height);
             }
 
-            fgImg.src = processImage
+            fgImg.src = processImage;
         }
-        img.src = image
+        img.src = image;
     }
 
     const handleDownload = async () => {
@@ -112,58 +83,134 @@ export function UploadDropzone() {
     }
 
     return (
-        <>
+        <div className="h-full bg-gray-50 p-4 flex items-center justify-center flex-col">
             {image ? (
                 <>
                     {loading ? (
-                        <div className="flex items-center justify-center">
+                        <div className="flex items-center justify-center min-h-[400px]">
                             <div className="h-10 w-10 animate-spin rounded-full border-2 border-dashed border-gray-800"></div>
                         </div>
                     ) : (
-                        <div className="flex w-full max-w-2xl flex-col items-center gap-4">
-                            <div className="my-4 w-full flex flex-col items-center gap-3">
+                        <div className="flex w-full max-w-6xl mx-auto items-start gap-6">
+                            <div className="flex-1 flex flex-col items-center gap-4">
                                 <button onClick={() => {
                                     setImage(null);
                                     setProcessImage(null);
-                                    setCanvasReady(false)
-                                }} className="flex items-center gap-2 self-start">
+                                    setCanvasReady(false);
+                                }} className="flex items-center gap-2 self-start py-2 hover:text-gray-600 transition-colors">
                                     <ArrowLeft className="w-4 h-4" />
                                     <span>Go back</span>
                                 </button>
-                                <canvas ref={canvasRef} className="max-h-lg h-auto w-full max-w-lg rounded-lg border" />
+                                <div className="bg-white rounded-lg border p-4 w-full">
+                                    <canvas
+                                        ref={canvasRef}
+                                        className="max-w-full max-h-[600px] rounded-lg border object-contain mx-auto block"
+                                        width="300"
+                                        height="300"
+                                    />
+                                </div>
                             </div>
-                            <Card className="w-full">
+                            <Card className="w-80 shrink-0">
                                 <CardHeader>
-                                    <CardTitle>Edit</CardTitle>
+                                    <CardTitle>Text Editor</CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="grid w-full items-center gap-4">
-                                        <div className="flex flex-col gap-1.5">
-                                            <Label htmlFor="text">Text</Label>
-                                            <Input id="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="text to thumbnail" />
+                                <CardContent className="space-y-2">
+                                    {/* Text Input */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="text">Text</Label>
+                                        <Input
+                                            id="text"
+                                            value={text}
+                                            onChange={(e) => setText(e.target.value)}
+                                            placeholder="Enter your text"
+                                        />
+                                    </div>
+
+                                    {/* font style */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="fontFamily">Font Family</Label>
+                                        <Select value={fontFamily} onValueChange={setFontFamily}>
+                                            <SelectTrigger>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {fonts.map((font) => (
+                                                    <SelectItem key={font} value={font}>
+                                                        <span style={{ fontFamily: font }}>{font}</span>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {/* font size */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="fontSize">Font Size: {fontSize}px</Label>
+                                        <Slider
+                                            id="fontSize"
+                                            min={12}
+                                            max={120}
+                                            step={1}
+                                            value={[fontSize]}
+                                            onValueChange={(value) => setFontSize(value[0])}
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                    {/* opacity */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="opacity">Opacity: {textOpacity[0]}%</Label>
+                                        <Slider
+                                            id="opacity"
+                                            min={0}
+                                            max={100}
+                                            step={5}
+                                            value={textOpacity}
+                                            onValueChange={setTextOpacity}
+                                            className="mt-2"
+                                        />
+                                    </div>
+
+                                    {/* horizintalPosition */}
+                                    <div className="space-y-2">
+                                        <Label>Horizontal Position: {horizontalPosition[0]}%</Label>
+                                        <Slider
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            value={horizontalPosition}
+                                            onValueChange={setHorizontalPosition}
+                                            className="mt-2"
+                                        />
+                                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>Left</span>
+                                            <span>Center</span>
+                                            <span>Right</span>
                                         </div>
-                                        <div className="flex flex-col gap-1.5">
-                                            <Label htmlFor="font">Font</Label>
-                                            <Select value={text} onValueChange={(value) => {
-                                                setFont(value)
-                                            }}>
-                                                <SelectTrigger id="font">
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent position="popper">
-                                                    <SelectGroup>
-                                                        <SelectItem value="arial">Arial</SelectItem>
-                                                        <SelectItem value="inter">Inter</SelectItem>
-                                                        <SelectItem value="Domine">Domine</SelectItem>
-                                                    </SelectGroup>
-                                                </SelectContent>
-                                            </Select>
+                                    </div>
+
+                                    {/* vertical position */}
+                                    <div>
+                                        <Label>Vertical Position: {verticalPosition[0]}%</Label>
+                                        <Slider
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            value={verticalPosition}
+                                            onValueChange={setVerticalPosition}
+                                            className="mt-2"
+                                        />
+                                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>Top</span>
+                                            <span>Middle</span>
+                                            <span>Bottom</span>
                                         </div>
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex justify-between gap-2">
-                                    <Button className="w-full" onClick={handleDownload}>Download</Button>
-                                    <Button className="w-full" onClick={draw}>Update</Button>
+                                    <Button className="w-full flex items-center gap-3" onClick={handleDownload}>
+                                        <Download className="w-4 h-4" />
+                                        Download Thumbnail
+                                    </Button>
                                 </CardFooter>
                             </Card>
                         </div>
@@ -171,18 +218,12 @@ export function UploadDropzone() {
                 </>
             ) : (
                 <>
-                    <div className="flex flex-col items-center">
-                        <h1 className="scroll-m-20 text-center text-4xl font-bold tracking-tight text-balance">
-                            Want to create a thumnail?
-                        </h1>
-                        <p className="text-muted-foreground leading-8">
-                            Use one of the templates below.
-                        </p>
-
-                        <div className="flex items-center gap-4 mt-5 ">
-                            <Style image="/dog.png" selectedStyle={() => { setSelectedStyle("style1") }} isSelected={selectedStyle === "style1"} />
-                            <Style image="/dog.png" selectedStyle={() => { setSelectedStyle("style2") }} isSelected={selectedStyle === "style2"} />
-                            <Style image="/dog.png" selectedStyle={() => { setSelectedStyle("style3") }} isSelected={selectedStyle === "style3"} />
+                    <div className="flex flex-col items-center max-w-md mx-auto">
+                        <div className="text-center mb-8">
+                            <h1 className="text-4xl font-bold tracking-tight text-balance mb-2">Create Custom Thumbnails</h1>
+                            <p className="text-gray-600">
+                                Upload any image and add custom text overlays to create eye-catching thumbnails
+                            </p>
                         </div>
                     </div>
                     <Dropzone multiple={false} onDrop={async (acceptedFiles) => {
@@ -192,15 +233,15 @@ export function UploadDropzone() {
                             setIsLoading(true)
                             const reader = new FileReader();
                             reader.onload = async (e) => {
-                                const src = e.target?.result as string
+                                const src = e.target?.result as string;
                                 setImage(src);
 
                                 const blob = await removeBackground(src);
 
-                                const processURL = URL.createObjectURL(blob)
-                                setProcessImage(processURL)
-                                setCanvasReady(true)
-                                setIsLoading(false)
+                                const processURL = URL.createObjectURL(blob);
+                                setProcessImage(processURL);
+                                setCanvasReady(true);
+                                setIsLoading(false);
                             };
                             reader.readAsDataURL(file);
                             await Credit();
@@ -228,6 +269,6 @@ export function UploadDropzone() {
                     </Dropzone>
                 </>
             )}
-        </>
+        </div>
     )
 }

@@ -1,4 +1,5 @@
 import { SignOut } from "@/components/signout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CurrentProfile } from "@/lib/currentProfile";
 import { prisma } from "@/lib/db";
@@ -23,16 +24,16 @@ export default async function Layout({ children }: { children: React.ReactNode }
     })
 
     return (
-        <div className="h-screen w-full flex flex-col items-center overflow-y-scroll p-6">
-            <nav className="flex w-full items-center justify-between pb-6 border-b">
+        <div className="h-screen w-full flex flex-col items-center">
+            <nav className="flex w-full h-20 px-6 items-center justify-between border-b">
                 <Link href="/">
                     <span className="font-bold text-xl">Thumbnails</span>
                 </Link>
                 <div className="flex items-center gap-4">
-                    <p>{user?.credits} credits left</p>
+                    <Badge variant="secondary" className="py-2 text-sm">{user?.credits} credits left</Badge>
                     <Link href="/pricing">
                         <Button>
-                            Buy more credits
+                            Buy credits
                         </Button>
                     </Link>
                     <SignOut />
