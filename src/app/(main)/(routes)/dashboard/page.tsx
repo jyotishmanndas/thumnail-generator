@@ -1,12 +1,9 @@
 import { CurrentProfile } from "@/lib/currentProfile"
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
-import { Ghost } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { UploadDropzone } from "@/components/thumnail-creator/upload-dropzone";
-import { Style } from "@/components/thumnail-creator/style";
-import { Thumbnail } from "@/components/thumnail-creator/thumbnail";
 
 export default async function Dashboard() {
 
@@ -43,7 +40,6 @@ export default async function Dashboard() {
                         </Link>
                     </div>
                 ) : (
-                    // <Thumbnail />
                     <UploadDropzone />
                 )}
             </div>

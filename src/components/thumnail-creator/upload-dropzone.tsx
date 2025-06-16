@@ -3,7 +3,6 @@
 import { ArrowLeft, Cloud } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone"
-// import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
 import { Style } from "./style";
 import { removeBackground } from "@imgly/background-removal";
@@ -12,40 +11,19 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { inter, domine } from "../../app/fonts"
-const presets = {
-    style1: {
-        fontSize: 100,
-        fontWeight: "bold",
-        color: "rgba(255, 255, 255, 1)",
-        opacity: 1
-    },
-    style2: {
-        fontSize: 100,
-        fontWeight: "bold",
-        color: "rgba(0, 0, 0, 1)",
-        opacity: 1
-    },
-    style3: {
-        fontSize: 100,
-        fontWeight: "bold",
-        color: "rgba(255, 255, 255, 0.7)",
-        opacity: 0.7
-    }
-}
+import { inter, domine, presets } from "../../app/fonts"
+import { Credit } from "@/app/actions/credit";
 
 export function UploadDropzone() {
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [selectedStyle, setSelectedStyle] = useState("style1")
+    const [selectedStyle, setSelectedStyle] = useState("style1");
     const [loading, setIsLoading] = useState<boolean>(false);
     const [image, setImage] = useState<string | null>(null);
     const [processImage, setProcessImage] = useState<string | null>(null);
     const [canvasReady, setCanvasReady] = useState(false);
     const [text, setText] = useState("");
-    const [font, setFont] = useState("arial")
-
-    // const { startUpload } = useUploadThing("pdfUploader")
+    const [font, setFont] = useState("arial");
 
     useEffect(() => {
         if (canvasReady) {
@@ -152,7 +130,7 @@ export function UploadDropzone() {
                                     <ArrowLeft className="w-4 h-4" />
                                     <span>Go back</span>
                                 </button>
-                                <canvas ref={canvasRef} className="max-h-lg h-auto w-full max-w-lg rounded-lg" />
+                                <canvas ref={canvasRef} className="max-h-lg h-auto w-full max-w-lg rounded-lg border" />
                             </div>
                             <Card className="w-full">
                                 <CardHeader>
@@ -225,6 +203,7 @@ export function UploadDropzone() {
                                 setIsLoading(false)
                             };
                             reader.readAsDataURL(file);
+                            await Credit();
                         }
                     }}>
                         {({ getRootProps, getInputProps }) => (

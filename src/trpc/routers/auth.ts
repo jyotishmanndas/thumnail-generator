@@ -4,6 +4,7 @@ import { baseProcedure, createTRPCRouter } from "../init";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs"
 import { registerSchema } from "@/lib/schema";
+import Stripe from "stripe";
 
 export const authRouter = createTRPCRouter({
     signup: baseProcedure
@@ -26,13 +27,20 @@ export const authRouter = createTRPCRouter({
                         })
                     }
 
-                    const hashedPassword = await bcrypt.hash(password, 12)
+                    const hashedPassword = await bcrypt.hash(password, 12);
+
+                    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+                    const stripeCustomer = await stripe.customers.create({
+                        email: email.toLowerCase()
+                    })
 
                     const user = await prisma.user.create({
                         data: {
                             email,
                             password: hashedPassword,
-                            emailVerified: new Date()
+                            emailVerified: new Date(),
+                            stripeCustomerId: stripeCustomer.id
                         }
                     })
                     return user;

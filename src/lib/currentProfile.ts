@@ -13,7 +13,7 @@ export async function CurrentProfile() {
 
     const profile = await prisma.user.findUnique({
         where: {
-            id: session.user?.id
+            id: session?.user.id
         }
     })
     return profile;
