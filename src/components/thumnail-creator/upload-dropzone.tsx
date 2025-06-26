@@ -21,7 +21,7 @@ export function UploadDropzone() {
     const [image, setImage] = useState<string | null>(null);
     const [processImage, setProcessImage] = useState<string | null>(null);
     const [text, setText] = useState("");
-    const [fontSize, setFontSize] = useState(48);
+    const [fontSize, setFontSize] = useState(50);
     const [fontFamily, setFontFamily] = useState("Arial");
     const [textOpacity, setTextOpacity] = useState([100])
     const [horizontalPosition, setHorizontalPosition] = useState([50]);
@@ -36,8 +36,7 @@ export function UploadDropzone() {
     const draw = () => {
         if (!canvasRef.current || !canvasReady || !image || !processImage) {
             return
-        }
-
+        };
         const canvass = canvasRef.current;
         const ctx = canvass.getContext("2d");
         if (!ctx) return;
@@ -67,7 +66,6 @@ export function UploadDropzone() {
             fgImg.onload = () => {
                 ctx.drawImage(fgImg, 0, 0, canvass.width, canvass.height);
             }
-
             fgImg.src = processImage;
         }
         img.src = image;
@@ -87,8 +85,9 @@ export function UploadDropzone() {
             {image ? (
                 <>
                     {loading ? (
-                        <div className="flex items-center justify-center min-h-[400px]">
+                        <div className="flex flex-col items-center justify-center min-h-[400px]">
                             <div className="h-10 w-10 animate-spin rounded-full border-2 border-dashed border-gray-800"></div>
+                            Processing image...
                         </div>
                     ) : (
                         <div className="flex w-full max-w-6xl mx-auto items-start gap-6">
@@ -149,7 +148,7 @@ export function UploadDropzone() {
                                         <Slider
                                             id="fontSize"
                                             min={12}
-                                            max={120}
+                                            max={400}
                                             step={1}
                                             value={[fontSize]}
                                             onValueChange={(value) => setFontSize(value[0])}
@@ -207,7 +206,7 @@ export function UploadDropzone() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex justify-between gap-2">
-                                    <Button className="w-full flex items-center gap-3" onClick={handleDownload}>
+                                    <Button className="w-full flex items-center gap-3" onClick={handleDownload} >
                                         <Download className="w-4 h-4" />
                                         Download Thumbnail
                                     </Button>
