@@ -25,7 +25,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
     return (
         <div className="h-screen w-full flex flex-col items-center">
-            <nav className="flex w-full h-20 px-6 items-center justify-between border-b">
+            <nav className="flex w-full h-20 px-6 items-center justify-between border-b fixed top-0 left-0 right-0 z-50 bg-white">
                 <Link href="/">
                     <span className="font-bold text-xl">Thumbnails</span>
                 </Link>

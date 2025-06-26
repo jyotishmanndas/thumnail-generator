@@ -23,8 +23,8 @@ export default async function Dashboard() {
     })
 
     return (
-        <div className="flex items-center justify-center h-screen w-full px-4">
-            <div className="flex flex-col items-center">
+        <div className="flex items-center justify-center h-screen w-full px-4 mt-20">
+            <div className="flex flex-col items-center w-full">
                 {user?.credits === 0 ? (
                     <div className="flex flex-col items-center">
                         <h1 className="scroll-m-20 text-center text-4xl font-bold tracking-tight text-balance">
