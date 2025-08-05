@@ -18,22 +18,19 @@ export const authRouter = createTRPCRouter({
                         where: {
                             email: email
                         }
-                    })
-
+                    });
                     if (existingUser) {
                         throw new TRPCError({
                             code: "CONFLICT",
                             message: "User with this email already exists."
                         })
-                    }
+                    };
 
                     const hashedPassword = await bcrypt.hash(password, 12);
-
                     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
                     const stripeCustomer = await stripe.customers.create({
                         email: email.toLowerCase()
-                    })
+                    });
 
                     const user = await prisma.user.create({
                         data: {
@@ -47,10 +44,9 @@ export const authRouter = createTRPCRouter({
                 }
             } catch (error) {
                 console.log(error);
-
                 if (error instanceof TRPCError) {
                     throw error; // Re-throw our business logic errors unchanged
-                }
+                };
 
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",

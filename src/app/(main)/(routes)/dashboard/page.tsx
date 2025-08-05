@@ -6,12 +6,10 @@ import Link from "next/link";
 import { UploadDropzone } from "@/components/thumnail-creator/upload-dropzone";
 
 export default async function Dashboard() {
-
     const profile = await CurrentProfile();
-
     if (!profile) {
         return redirect("/signup")
-    }
+    };
 
     const user = await prisma.user.findUnique({
         where: {
@@ -20,7 +18,7 @@ export default async function Dashboard() {
         select: {
             credits: true
         }
-    })
+    });
 
     return (
         <div className="flex items-center justify-center h-screen w-full px-4 mt-20">

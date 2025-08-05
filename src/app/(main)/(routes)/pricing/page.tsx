@@ -5,7 +5,6 @@ import Link from "next/link";
 import { env } from "process";
 
 export default function Pricing() {
-
     return (
         <div className=" w-full h-full flex flex-col items-center justify-center">
             <Link href="/dashboard" className="flex items-center gap-2">

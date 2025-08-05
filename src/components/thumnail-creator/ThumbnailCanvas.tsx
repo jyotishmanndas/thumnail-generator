@@ -31,7 +31,7 @@ export const ThumbnailCanvas: React.FC<ThumbnailCanvasProps> = ({
     if (!canvass) return;
     const ctx = canvass.getContext("2d");
     if (!ctx) return;
-    const img = new window.Image();
+    const img = new Image();
     img.onload = () => {
       canvass.width = img.width;
       canvass.height = img.height;
@@ -46,7 +46,7 @@ export const ThumbnailCanvas: React.FC<ThumbnailCanvasProps> = ({
       ctx.fillStyle = "white";
       ctx.fillText(text, x, y);
       ctx.restore();
-      const fgImg = new window.Image();
+      const fgImg = new Image();
       fgImg.onload = () => {
         ctx.drawImage(fgImg, 0, 0, canvass.width, canvass.height);
       };

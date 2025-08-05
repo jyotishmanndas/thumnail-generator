@@ -9,10 +9,9 @@ import { redirect } from "next/navigation";
 export default async function Layout({ children }: { children: React.ReactNode }) {
 
     const profile = await CurrentProfile();
-
     if (!profile) {
         return redirect("/signup")
-    }
+    };
 
     const user = await prisma.user.findUnique({
         where: {
@@ -21,7 +20,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         select: {
             credits: true
         }
-    })
+    });
 
     return (
         <div className="h-screen w-full flex flex-col items-center">

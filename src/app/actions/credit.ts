@@ -6,12 +6,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function Credit() {
-
     const profile = await CurrentProfile();
 
     if (!profile) {
         throw new Error("Unauthorized")
-    }
+    };
 
     await prisma.user.update({
         where: {
@@ -22,8 +21,7 @@ export async function Credit() {
                 decrement: 1
             }
         }
-    })
-
+    });
     revalidatePath("/dashboard");
     return { success: true }
 }
